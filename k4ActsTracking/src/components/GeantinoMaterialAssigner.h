@@ -26,7 +26,11 @@
 #include <Acts/Material/IAssignmentFinder.hpp>
 #include <Acts/Material/PropagatorMaterialAssigner.hpp>
 #include <Acts/Propagator/ActorList.hpp>
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
 #include <Acts/Propagator/DefaultActor.hpp>
+#else
+#include <Acts/Propagator/StandardAborters.hpp>
+#endif
 #include <Acts/Propagator/SurfaceCollector.hpp>
 #include <Acts/Utilities/Logger.hpp>
 #include <Acts/Utilities/VectorHelpers.hpp>
@@ -120,14 +124,23 @@ public:
     // Same actors as Acts::PropagatorMaterialAssigner; the collectors and the
     // surface selector are reused from its header rather than duplicated.
     using MaterialSurfaceCollector = Acts::SurfaceCollector<Acts::MaterialSurfaceIdentifier>;
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
     using ActorList = Acts::ActorList<Acts::DefaultActor, MaterialSurfaceCollector, Acts::InteractionVolumeCollector>;
+#else
+    using ActorList =
+        Acts::ActorList<MaterialSurfaceCollector, Acts::InteractionVolumeCollector, Acts::EndOfWorldReached>;
+#endif
     using PropagatorOptions = typename propagator_t::template Options<ActorList>;
 
     PropagatorOptions options(gctx, mctx);
     options.maxSteps = m_maxSteps;
 
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
     auto state = m_propagator.makeState(options);
     const auto result = m_propagator.propagate(state, start, nullptr, /*createFinalParameters=*/false);
+#else
+    const auto result = m_propagator.propagate(start, options, /*createFinalParameters=*/false);
+#endif
 
     ++m_stats->nTracks;
     if (!result.ok()) {
@@ -141,12 +154,20 @@ public:
 
     m_stats->maxStepsObserved = std::max(m_stats->maxStepsObserved, result.value().steps);
 
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
     const auto& surfaceResult = state.actor.template get<MaterialSurfaceCollector::State>();
+#else
+    const auto& surfaceResult = result.value().template get<MaterialSurfaceCollector::result_type>();
+#endif
     for (const auto& hit : surfaceResult.collected) {
       candidates.first.push_back(Acts::IAssignmentFinder::SurfaceAssignment{hit.surface, hit.position, direction});
     }
 
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
     const auto& volumeResult = state.actor.template get<Acts::InteractionVolumeCollector::State>();
+#else
+    const auto& volumeResult = result.value().template get<Acts::InteractionVolumeCollector::result_type>();
+#endif
     for (const auto& [geoId, assignment] : volumeResult.collected) {
       candidates.second.push_back(assignment);
     }

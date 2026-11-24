@@ -493,8 +493,12 @@ public:
         // innermost measurement surface. Must happen before
         // ACTS2edm4hep_track, which fills the AtIP state. Include the material
         // crossed on the way (beam pipe) in the covariance.
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
         using ExtrapolationOptions =
             CKFPropagator::Options<Acts::ActorList<Acts::DefaultActor, Acts::MaterialInteractor>>;
+#else
+        using ExtrapolationOptions = CKFPropagator::Options<Acts::ActorList<Acts::MaterialInteractor>>;
+#endif
         ExtrapolationOptions exOptions(m_geoCtx, m_magCtx);
         exOptions.maxSteps = m_maxSteps;
         const CKFPropagator& extrapolator = *m_extrapolator;

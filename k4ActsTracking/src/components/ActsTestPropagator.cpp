@@ -33,7 +33,11 @@
 #include <Acts/MagneticField/MagneticFieldContext.hpp>
 #include <Acts/Material/MaterialInteraction.hpp>
 #include <Acts/Propagator/ActorList.hpp>
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
 #include <Acts/Propagator/DefaultActor.hpp>
+#else
+#include <Acts/Propagator/StandardAborters.hpp>
+#endif
 #include <Acts/Propagator/EigenStepper.hpp>
 #include <Acts/Propagator/MaterialInteractor.hpp>
 #include <Acts/Propagator/Navigator.hpp>
@@ -121,7 +125,11 @@ std::vector<podio::UserDataCollection<double>> ActsTestPropagator::operator()() 
   using Navigator = Acts::Navigator;
   using Propagator = Acts::Propagator<Stepper, Navigator>;
 
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
   using ActorList = Acts::ActorList<Acts::DefaultActor, SteppingLogger, MaterialInteractor>;
+#else
+  using ActorList = Acts::ActorList<SteppingLogger, MaterialInteractor, Acts::EndOfWorldReached>;
+#endif
   using PropagatorOptions = Propagator::template Options<ActorList>;
 
   // Configurations
@@ -168,14 +176,22 @@ std::vector<podio::UserDataCollection<double>> ActsTestPropagator::operator()() 
     const auto startParameters = Acts::BoundTrackParameters::createCurvilinear(
         startPos, direction, qOverP, std::nullopt, Acts::ParticleHypothesis::pion());
 
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
     auto state = propagator.makeState(options);
     const auto result = propagator.propagate(state, startParameters);
+#else
+    const auto result = propagator.propagate(startParameters, options);
+#endif
     if (!result.ok()) {
       warning() << "Propagation failed for track " << i << ": " << result.error() << endmsg;
       continue;
     }
 
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
     const auto& steppingResults = state.actor.get<SteppingLogger::State>();
+#else
+    const auto& steppingResults = result.value().get<SteppingLogger::result_type>();
+#endif
 
     // Store step results from this track
     for (const auto& step : steppingResults.steps) {

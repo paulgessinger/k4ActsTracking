@@ -35,7 +35,11 @@
 #include <Acts/EventData/ParticleHypothesis.hpp>
 #include <Acts/MagneticField/InterpolatedBFieldMap.hpp>
 #include <Acts/Propagator/ActorList.hpp>
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
 #include <Acts/Propagator/DefaultActor.hpp>
+#else
+#include <Acts/Propagator/StandardAborters.hpp>
+#endif
 #include <Acts/Propagator/PropagatorOptions.hpp>
 #include <Acts/Propagator/detail/CovarianceEngine.hpp>
 #include <Acts/Surfaces/BoundaryTolerance.hpp>
@@ -182,10 +186,18 @@ CaloExtrapolationResult extrapolateToCaloFace(const CaloFacePropagator& propagat
     return {std::nullopt, CaloExtrapolationStatus::NoSurfaces};
   }
 
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
   using Options = CaloFacePropagator::Options<Acts::ActorList<Acts::DefaultActor, CaloSurfaceReached>>;
+#else
+  using Options = CaloFacePropagator::Options<Acts::ActorList<CaloSurfaceReached>>;
+#endif
   Options options{gctx, mctx};
   options.maxSteps = maxSteps;
+#ifndef K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR
   options.actor.get<CaloSurfaceReached>().caloIds = &caloSurfaceGeoIds;
+#else
+  options.actorList.get<CaloSurfaceReached>().caloIds = &caloSurfaceGeoIds;
+#endif
 
   auto result = propagator.propagate(start, options);
   if (!result.ok()) {
