@@ -14,8 +14,8 @@ and truth matching) usable from `k4run` option files.
 
 ## Dependencies
 
-* [ACTS](https://github.com/acts-project/acts) (`Core`, `PluginDD4hep`,
-  `PluginJson`, `PluginRoot`)
+* [ACTS](https://github.com/acts-project/acts) **49.0.0 or newer**, with C++23
+  (`Core`, `PluginDD4hep`, `PluginEDM4hep`, `PluginJson`, `PluginRoot`)
 * [DD4hep](https://github.com/AIDASoft/DD4hep) (`DDCore`, `DDRec`)
 * [EDM4hep](https://github.com/key4hep/EDM4hep)
 * [k4FWCore](https://github.com/key4hep/k4FWCore)
@@ -39,7 +39,7 @@ part of a Key4hep release yet, see
 ```sh
 mkdir -p build install
 cmake -B build -S . -GNinja \
-  -DCMAKE_CXX_STANDARD=20 \
+  -DCMAKE_CXX_STANDARD=23 \
   -DCMAKE_INSTALL_PREFIX=$(pwd)/install \
   -DCMAKE_CXX_FLAGS=" -fdiagnostics-color=always -Werror -Wno-error=deprecated-declarations"
 cmake --build build

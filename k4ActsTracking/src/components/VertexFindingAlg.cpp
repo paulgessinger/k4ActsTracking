@@ -284,11 +284,6 @@ StatusCode VertexFindingAlg::initialize() {
   // Linear expansion of the track parameters around the vertex candidate,
   // which is what makes the Kalman-style vertex fit possible.
   Linearizer::Config linCfg;
-  [&]<typename Config>(Config& cfg) {
-    if constexpr (requires { cfg.bField; }) {
-      cfg.bField = m_magneticField;
-    }
-  }(linCfg);
   linCfg.propagator = m_propagator;
   m_linearizer.emplace(linCfg, m_actsLogger->cloneWithSuffix("Linearizer"));
 

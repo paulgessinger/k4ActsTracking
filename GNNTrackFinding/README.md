@@ -73,25 +73,15 @@ required and the rest of `k4ActsTracking` builds without them.
 ## Dependencies
 In order to build this package you need a couple of dependencies that are not
 yet found in the Key4hep stack. Specifically, you need
-- Acts built with the `PluginGnn`.
-  - This in turn requires the c++ library of [pytorch_scatter](https://github.com/rusty1s/pytorch_scatter) to be built.
-  - Acts has to be recent enough to provide the node feature selection and
-    scaling of `OnnxEdgeClassifier`
-    ([acts#5646](https://github.com/acts-project/acts/pull/5646)) and to pass
-    the selected features in the configured order
-    ([acts#6142](https://github.com/acts-project/acts/pull/6142)). No release
-    contains the latter yet (the last one checked is v48.0.1), so build Acts from
-    its main branch. CMake requires Acts >= 48.1.0, the first release cut from
-    main after acts#6142; main itself reports version 999.999.999 and passes.
-
-In particular the GNN plugin and the c++ library of pytorch_scatter are not yet
-available via spack, so they need some manual intervention.
+- Acts 49.0.0 or newer built with `PluginGnn`, using C++23. This includes the
+  node feature selection, scaling, and ordering needed by `OnnxEdgeClassifier`.
+- The C++ libraries of ONNX Runtime and PyTorch.
 
 The specific flags for building ACTS with the GNN plugin **but without CUDA
 support are**
 ```
 -DACTS_BUILD_PLUGIN_GNN=ON \
--DACTS_GNN_ENABLE_CUDA=OFF \
+-DACTS_ENABLE_CUDA=OFF \
 -DACTS_GNN_ENABLE_ONNX=ON \
 -DACTS_GNN_ENABLE_TORCH=ON
 ```
