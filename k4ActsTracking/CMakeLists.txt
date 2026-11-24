@@ -30,10 +30,6 @@ gaudi_add_library(k4ActsTracking
     k4FWCore::k4FWCore
     ${ACTS_LIBRARY_TARGETS}
 )
-# Export the API selection because CKFRunner.hxx is a public header.
-if(Acts_VERSION VERSION_LESS 49.0.0)
-  target_compile_definitions(k4ActsTracking PUBLIC K4ACTSTRACKING_ACTS_LEGACY_PROPAGATOR)
-endif()
 install(TARGETS k4ActsTracking
   EXPORT k4ActsTrackingTargets
   INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"

@@ -14,7 +14,7 @@ and truth matching) usable from `k4run` option files.
 
 ## Dependencies
 
-* [ACTS](https://github.com/acts-project/acts) (`Core`, `PluginDD4hep`,
+* [ACTS](https://github.com/acts-project/acts) >= 49.0.0 (`Core`, `PluginDD4hep`,
   `PluginJson`, `PluginRoot`)
 * [DD4hep](https://github.com/AIDASoft/DD4hep) (`DDCore`, `DDRec`)
 * [EDM4hep](https://github.com/key4hep/EDM4hep)

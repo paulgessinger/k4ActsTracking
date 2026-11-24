@@ -46,14 +46,14 @@ find_package(Acts REQUIRED COMPONENTS ${ACTS_COMPONENTS})
 if(NOT DEFINED Acts_VERSION AND IS_DIRECTORY "${ACTS_SOURCE_DIR}")
   get_directory_property(Acts_VERSION DIRECTORY "${ACTS_SOURCE_DIR}" DEFINITION Acts_VERSION)
 endif()
+# Check separately: Acts' package version file only accepts the same major,
+# while development builds report 999.999.999.
+if(Acts_VERSION VERSION_LESS 49.0.0)
+  message(FATAL_ERROR "k4ActsTracking needs Acts >= 49.0.0 (or main), found ${Acts_VERSION}")
+endif()
 find_package(DD4hep REQUIRED COMPONENTS DDCore DDRec)
 find_package(TBB REQUIRED)
 if(K4ACTSTRACKING_BUILD_GNN)
-  # The GNN track finding needs OnnxEdgeClassifier to pass the node features in
-  # the configured order (acts#6142), which is in main but not in v48.0.1.
-  if(Acts_VERSION VERSION_LESS 48.1.0)
-    message(FATAL_ERROR "K4ACTSTRACKING_BUILD_GNN needs Acts >= 48.1.0 (or main), found ${Acts_VERSION}")
-  endif()
   find_package(onnxruntime REQUIRED)
   find_package(Torch REQUIRED)
 endif()
